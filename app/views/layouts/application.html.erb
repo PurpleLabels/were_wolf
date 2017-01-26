@@ -1,14 +1,38 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WereWolf</title>
+    <title><%= full_title(yield(:title)) %></title>
+    <%= stylesheet_link_tag "application", media: "all",
+                                           "data-turbolinks-track" => true %>
+                                           <!--sssssfsfdfafsdf-->
+                                           
+    <%= javascript_include_tag "application",
+                                           "data-turbolinks-track" => true %>
+    
+    <!--ssssss-->
     <%= csrf_meta_tags %>
+    <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= render 'layouts/shiv' %>
+    
   </head>
-
   <body>
-    <%= yield %>
+    <script type="text/javascript"  >
+    $(function() {
+      $(".button-collapse").sideNav();
+    });
+    </script>
+    <%= render 'layouts/header' %>
+    <div class="container" style="margin-top: 30px;">
+      <div style="max-width: 600px;margin:auto;">
+        <%= yield %>
+      </div>
+    </div>
+    <!--<%= render 'layouts/footer' %>-->
+
+
   </body>
 </html>

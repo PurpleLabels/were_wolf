@@ -19,7 +19,10 @@ default: &default
 
 development:
   <<: *default
-  database: were_wolf_development
+  database: c9
+  username: <%=ENV['C9_USER']%>
+  host: <%=ENV['IP']%>
+  #database: were_wolf_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
