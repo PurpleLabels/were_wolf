@@ -27,7 +27,7 @@
 	<div id="test2" class="col s12">
 		<ul class="collection with-header" id ="settings">
 			<li class="collection-header">設置時間</li>
-			<%= form_for @village, :url => {:action => 'update'} do |f| %>
+			<%= form_for @village do |f| %>
 			<li class="collection-item">昼　議論の時間
 				<div class="secondary-content">
 					<a class="plusminus" onclick="minus('#village_day_time')">　-　</a>
@@ -56,15 +56,17 @@
 			<li class="collection-item"><%= villageSetting.name %> 
 				<div class="secondary-content">
 					<a onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">　-　</a>
-					<%= text_field_tag 'villageSetting[num]', villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
+					<%= text_field_tag 'villageSetting[num]'+villageSetting.job_id.to_s, villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
 					<a onclick="plus('#<%= "job" + villageSetting.job_id.to_s %>')">　+　</a>
 				</div>
 			</li>
 			<% end %>
+			
 			<% end %>
+			<%= f.submit "設定", class: "waves-effect waves-light btn-large" %>
 		</ul>
-		<%= submit_tag %>
-		<% end -%>
+		
+		<% end %>
 	</div>
 </div>
 <a href="#!" class="btn">+</a>

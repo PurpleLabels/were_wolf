@@ -5,7 +5,14 @@ class VillagesController < ApplicationController
     @user.village_id = @village.id
     @user.save
     @users = User.where("village_id = "+params[:id])
-    @villageSettings = VillageSetting.joins("INNER JOIN jobs ON village_settings.job_id = jobs.id").select('village_settings.*,jobs.*').where("village_id = "+params[:id] )
+    #@villageSettings = VillageSetting.joins("INNER JOIN jobs ON village_settings.job_id = jobs.id").select('village_settings.*,jobs.*').where("village_id = "+params[:id] )
+    @villageSettings = VillageSetting.joins(:job).select("village_settings.*,jobs.*").where("village_id = "+params[:id] )
+
+  end
+  
+  def update
+    byebug
+    redirect_to :action => "show", :id => params.require(:id)
   end
   
   def new
