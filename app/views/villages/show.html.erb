@@ -2,6 +2,16 @@
 <h3>
 	<%= @village.name %>
 </h3>
+<%= link_to "ゲーム開始", start_villages_path(@village),
+                                class: "waves-effect waves-light btn-large", remote: true%>
+<%= link_to "ゲーム中断", stop_villages_path(@village),
+                                class: "waves-effect waves-light btn-large", remote: true%>
+<%= link_to "リロード", reload_villages_path(village_id:@village.id),
+                                class: "waves-effect waves-light btn-large", remote: true,id:"reload"%>
+<%= link_to "投票へ移る", to_vote_villages_path(village_id:@village.id),
+                                class: "waves-effect waves-light btn-large", remote: true%>
+
+
 <%= link_to "退出", search_villages_path,
                                 class: "waves-effect waves-light btn-large"%>
 <div class="row card">
@@ -72,16 +82,12 @@
 <a href="#!" class="btn">+</a>
 <a class="btn-floating" style="text-align: center;">+</a>
 <script type="text/javascript">
-window.onbeforeunload = function(e){
-  e.returnValue = "hoge";
-  console.log(e);
-  console.log("hoge");
-}
+
 
 $(function() {
   $('ul.tabs').tabs('select_tab', 'tab_id');
   App.room.in_out('<%= @village.id %>');
-  
+
 });
 
 function plus(id){
@@ -94,6 +100,7 @@ function minus(id){
 }
 
 function calc(){
+	
    var total = parseInt($("#count").html());
    $("#job2").val(total 
    <% @villageSettings.each do |villageSetting| %>
@@ -103,5 +110,18 @@ function calc(){
    <% end %>
     )
    //$("#villager").val(total - parseInt($("#werewolf").val()) - parseInt($("#fortuneteller").val()) - parseInt($("#knight").val()) - parseInt($("#priest").val()) - parseInt($("#madman").val()));
+}
+function reload(village_id,user_id){
+	if (<%= current_user.id %> != user_id) {
+		$('#reload').click();
+	} 
+}
+
+function reading(user_id,user_name,job){
+    if (job=='1') {
+         alert(user_name+"さんは人狼です。");
+    } else {
+        alert(user_name+"さんは人間です。");
+    }
 }
 </script>

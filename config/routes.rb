@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   #resources :villages, only: [:show]
   resources :villages, only: [:show, :new, :create,:update] do
     collection do
-      get :search
+      get :search,:start,:day, :night,:stop,:vote,:reload,:to_vote
 
     end
   end

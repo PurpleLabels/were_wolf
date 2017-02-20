@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  village_id: 1
+  user_id: 1
+  voted_user: 1
+
+two:
+  village_id: 1
+  user_id: 1
+  voted_user: 1

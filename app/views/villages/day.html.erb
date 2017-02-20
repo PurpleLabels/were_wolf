@@ -1,0 +1,12 @@
+<% provide(:title, '村') %>
+<h3>
+	お昼
+</h3>
+
+<%= link_to "退出", search_villages_path,
+                                class: "waves-effect waves-light btn-large"%>
+	<div id="test1" class="col s12">
+		<ul class="collection users" id ="users">
+			<%= render @users %>
+		</ul>
+	</div>

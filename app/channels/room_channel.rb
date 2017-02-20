@@ -20,7 +20,7 @@
         stop_all_streams
         stream_from "village:#{village_id}"
         @users = User.where("village_id = "+village_id)
-        @rr = ApplicationController.renderer.render(@users)
-        ActionCable.server.broadcast "village:#{village_id}", message: @rr,count:@users.count
+        #@rr = ApplicationController.renderer.render(@users)
+        ActionCable.server.broadcast "village:#{village_id}",count:@users.count,Action:'show',village_id:village_id.to_s,user_id:current_user.id
     end
  end

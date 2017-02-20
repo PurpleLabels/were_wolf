@@ -2,12 +2,19 @@ user = VillageSetting.new(village_id: "Michael Hartl", job_id: "mhartl@example.c
 
 vs = VillageSetting.new.new(village_id: 1, job_id: 1, num:0)
 ロールは使ってない
+
 job = Job.new(name:"人狼")
+job.save
 job = Job.new(name:"村人")
+job.save
 job = Job.new(name:"占い師")
+job.save
 job = Job.new(name:"騎士")
+job.save
 job = Job.new(name:"霊媒師")
+job.save
 job = Job.new(name:"狂人")
+job.save
 
 
 @villageSettings = 
