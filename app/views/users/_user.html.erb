@@ -8,24 +8,33 @@
         待機中
     <% else %>
         <!-- 死亡の場合 -->
-        <% if user.is_dead  || current_user.is_dead%>
+        <% if user.is_dead %>
             死亡
+            <% if current_user.job_id == 5 %>
+              <% if user.job_id == 1 %>
+                人狼
+              <% else %>
+                人間
+              <% end %>
+            <% end %>
         <!-- 自分の場合 -->
         <% elsif user.id == current_user.id  %>
             <%= Job.find(current_user.job_id).name  %>
         <% else %>
             <!--　昼画面の場合 -->
             <% if current_user.action_type == 1 %>
-            昼ですね
+              生存
             <% end %>
             <!--　夜画面の場合 -->
             <% if current_user.action_type == 2 %>
-                
-                    
+
+
                     <!--　夜画面の場合　人狼 -->
-                    <% if current_user.job_id == 1 %>
-                        
-                        
+                    <% if current_user.is_dead %>
+
+                    <% elsif current_user.job_id == 1 %>
+
+
                         <% if user.job_id == 1 %>
                             人狼
                         <% else %>
@@ -38,18 +47,18 @@
                         <%= link_to "占う", night_villages_path(user.id), remote: true, onclick:"reading(" + user.id.to_s + ",'" + user.name  + "'," + user.job_id.to_s + ")"%>
                     <!--　夜画面の場合　騎士 -->
                     <% elsif current_user.job_id == 4 %>
-                    
+
                     <!--　夜画面の場合　霊媒師 -->
                     <% elsif current_user.job_id == 5 %>
-                    
+                    <%= link_to "疑う", night_villages_path(user.id), remote: true%>
                     <!--　夜画面の場合　村人　狂人 -->
                     <% else %>
                     <%= link_to "疑う", night_villages_path(user.id), remote: true%>
                     <% end %>
-                
+
             <% end %>
             <!--　投票画面の場合 -->
-            <% if current_user.action_type == 3 %>
+            <% if current_user.action_type == 3 && !current_user.is_dead%>
                 <%= link_to "投票", vote_villages_path(user_id:user.id), remote: true%>
             <% end %>
         <% end %>

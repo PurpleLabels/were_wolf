@@ -2,9 +2,10 @@
 <h3>
 	<%= @village.name %>
 </h3>
+<%= @village.action_type %>
 <%= link_to "ゲーム開始", start_villages_path(@village),
                                 class: "waves-effect waves-light btn-large", remote: true%>
-<%= link_to "ゲーム中断", stop_villages_path(@village),
+<%= link_to "ゲーム終了", stop_villages_path(@village),
                                 class: "waves-effect waves-light btn-large", remote: true%>
 <%= link_to "リロード", reload_villages_path(village_id:@village.id),
                                 class: "waves-effect waves-light btn-large", remote: true,id:"reload"%>
@@ -59,11 +60,11 @@
 					<a onclick="plus('#village_vote_time')">　+　</a>
 				</div>
 			</li>
-			
+
 			<li class="collection-header">役職</li>
 			<% @villageSettings.each do |villageSetting| %>
 			<%= f.fields_for :villageSetting do |h|%>
-			<li class="collection-item"><%= villageSetting.name %> 
+			<li class="collection-item"><%= villageSetting.name %>
 				<div class="secondary-content">
 					<a onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">　-　</a>
 					<%= text_field_tag 'villageSetting[num]'+villageSetting.job_id.to_s, villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
@@ -71,16 +72,15 @@
 				</div>
 			</li>
 			<% end %>
-			
+
 			<% end %>
 			<%= f.submit "設定", class: "waves-effect waves-light btn-large" %>
 		</ul>
-		
+
 		<% end %>
 	</div>
 </div>
-<a href="#!" class="btn">+</a>
-<a class="btn-floating" style="text-align: center;">+</a>
+
 <script type="text/javascript">
 
 
@@ -100,9 +100,9 @@ function minus(id){
 }
 
 function calc(){
-	
+
    var total = parseInt($("#count").html());
-   $("#job2").val(total 
+   $("#job2").val(total
    <% @villageSettings.each do |villageSetting| %>
      <% if villageSetting.job_id != 2 %>
      - parseInt($("#<%= "job" + villageSetting.job_id.to_s %>").val())
@@ -114,7 +114,7 @@ function calc(){
 function reload(village_id,user_id){
 	if (<%= current_user.id %> != user_id) {
 		$('#reload').click();
-	} 
+	}
 }
 
 function reading(user_id,user_name,job){
