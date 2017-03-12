@@ -17,7 +17,7 @@ job = Job.new(name:"狂人")
 job.save
 
 
-@villageSettings = 
+@village_settings = 
 VillageSetting.joins("LEFT JOIN jobs ON villageSettings.job_id = jobs.id).where("village_id = 82" )
 
 VillageSetting.joins("INNER JOIN jobs ON village_settings.job_id = jobs.id").select('village_settings.*,jobs.*').where("village_id = 82" )

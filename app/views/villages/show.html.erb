@@ -61,7 +61,7 @@
 			</li>
 
 			<li class="collection-header">役職</li>
-			<% @villageSettings.each do |villageSetting| %>
+			<% @village_settings.each do |villageSetting| %>
 			<%= f.fields_for :villageSetting do |h|%>
 			<li class="collection-item"><%= villageSetting.name %>
 				<div class="secondary-content">
@@ -106,7 +106,7 @@
 	function calc() {
 
 		var total = parseInt($("#count").html());
-		$("#job2").val(total <% @villageSettings.each do |villageSetting| %>
+		$("#job2").val(total <% @village_settings.each do |villageSetting| %>
 		<% if villageSetting.job_id != 2 %> - parseInt($("#<%= "job" + villageSetting.job_id.to_s %>").val())<% end %>
 		<% end %>)
 		//$("#villager").val(total - parseInt($("#werewolf").val()) - parseInt($("#fortuneteller").val()) - parseInt($("#knight").val()) - parseInt($("#priest").val()) - parseInt($("#madman").val()));

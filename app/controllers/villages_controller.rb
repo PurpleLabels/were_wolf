@@ -1,10 +1,12 @@
 class VillagesController < ApplicationController
   def reload
-    @users = User.where('village_id = ' + params[:village_id].to_s)
+    @users = User.where(village_id: params[:village_id])
     @village = Village.find(params[:village_id])
-    @villageSettings = VillageSetting.joins(:job)
-                                     .select('village_settings.*,jobs.*')
-                                     .where('village_id = ' + params[:village_id])
+    # TODO: YAGUNI
+    # @village_settings = VillageSetting.joins(:job)
+    #                                  .select('village_settings.*,jobs.*')
+    #                                  .where(village_id: params[:village_id])
+
     action = get_action(@users, @village)
     set_action(@users, @village, action)
     message = get_message(@users, @village, action)
@@ -19,17 +21,17 @@ class VillagesController < ApplicationController
   end
 
   def start
-    @villageSettings = VillageSetting.where('village_id = ' + params[:format] + ' and num <> 0')
-    @villageSettings = @villageSettings.shuffle
+    @village_settings = VillageSetting.where('village_id = ' + params[:format] + ' and num <> 0')
+    @village_settings = @village_settings.shuffle
     @village = Village.find(params[:format])
     @village.action_type = 'start'
     @village.save
-    @users = User.where('village_id = ' + params[:format])
+    @users = User.where(village_id: params[:format])
     i = 0
     j = 0
     @users.each do |user|
-      j = @villageSettings[i].num if j.zero?
-      user.job_id = @villageSettings[i].job_id
+      j = @village_settings[i].num if j.zero?
+      user.job_id = @village_settings[i].job_id
       user.action_type = 'night'
       user.is_dead = false
       user.save
@@ -37,9 +39,9 @@ class VillagesController < ApplicationController
       i += 1 if j.zero?
     end
     Vote.destroy_all('village_id = ' + current_user.village_id.to_s)
-    @villageSettings = VillageSetting.joins(:job)
-                                     .select('village_settings.*,jobs.*')
-                                     .where('village_id = ' + params[:format])
+    @village_settings = VillageSetting.joins(:job)
+                                      .select('village_settings.*,jobs.*')
+                                      .where(village_id: params[:format])
     redirect_to action: 'reload', village_id: current_user.village_id
   end
 
@@ -68,7 +70,7 @@ class VillagesController < ApplicationController
   end
 
   def to_vote
-    @users = User.where('village_id = ' + params[:village_id])
+    @users = User.where(village_id: params[:village_id])
     @users.each do |user|
       user.action_type = 'vote'
       user.save
@@ -94,11 +96,13 @@ class VillagesController < ApplicationController
   end
 
   def stop
-    @users = User.where('village_id = ' + params[:format])
+    @users = User.where(village_id: params[:format])
     @village = Village.find(params[:format])
     @village.action_type = 'stop'
     @village.save
-    @villageSettings = VillageSetting.joins(:job).select('village_settings.*,jobs.*').where('village_id = ' + params[:format])
+    @village_settings = VillageSetting.joins(:job)
+                                      .select('village_settings.*,jobs.*')
+                                      .where(village_id: params[:format])
     @users.each do |user|
       user.job_id = 1
       user.action_type = 'wait'
@@ -112,9 +116,10 @@ class VillagesController < ApplicationController
     current_user.village_id = @village.id
     current_user.action_type = 'no_Game'
     current_user.save
-    @users = User.where('village_id = ' + params[:id])
-    # @villageSettings = VillageSetting.joins("INNER JOIN jobs ON village_settings.job_id = jobs.id").select('village_settings.*,jobs.*').where("village_id = "+params[:id] )
-    @villageSettings = VillageSetting.joins(:job).select('village_settings.*,jobs.*').where('village_id = ' + params[:id])
+    @users = User.where(village_id: params[:id])
+    @village_settings = VillageSetting.joins(:job)
+                                      .select('village_settings.*,jobs.*')
+                                      .where(village_id: params[:id])
   end
 
   def update
@@ -165,26 +170,26 @@ class VillagesController < ApplicationController
 
   def search
     @villages = Village.all
-    @village_id = current_user.village_id
+    village_id = current_user.village_id
 
-    unless @village_id.nil?
-      @users = User.where('village_id = ' + @village_id.to_s)
+    unless village_id.nil?
+      @users = User.where(village_id: village_id)
       if @users.count == 1
         Village.destroy(current_user.village_id)
         current_user.update(village_id: nil, is_admin: false)
         @users.update_all(village_id: nil, is_admin: false)
       else
         if current_user.is_admin
-          @remains = User.where('village_id = ' + @village_id.to_s + ' and is_admin = false')
+          @remains = User.where('village_id = ' + village_id.to_s + ' and is_admin = false')
           @remains.first.update(is_admin: true)
           @remains.first.save
         end
         current_user.update(village_id: nil, is_admin: false)
         current_user.save
-        # @rr = ApplicationController.renderer.render(@users)
-        ActionCable.server.broadcast "village:#{@village_id}",
+
+        ActionCable.server.broadcast "village:#{village_id}",
                                      count: @users.count,
-                                     village_id: @village_id.to_s,
+                                     village_id: village_id.to_s,
                                      Action: 'reload',
                                      message: '',
                                      user_id: current_user.id
@@ -244,17 +249,17 @@ class VillagesController < ApplicationController
     end
 
     if users.count == wait && village.action_type == 'night'
-      return 'end_Night'
+      'end_Night'
     elsif users.count == wait && village.action_type == 'vote'
-      return 'end_Vote'
+      'end_Vote'
     elsif users.count == wait && village.action_type == 'stop'
-      return 'end_Game'
+      'end_Game'
     elsif village.action_type == 'to_Vote'
-      return 'to_Vote'
+      'to_Vote'
     elsif village.action_type == 'start'
-      return 'start'
+      'start'
     else
-      return 'reload'
+      'reload'
     end
   end
 
