@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170220102019) do
+ActiveRecord::Schema.define(version: 20170311110608) do
 
   create_table "jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 20170220102019) do
     t.integer  "job_id"
     t.boolean  "is_admin",               default: false
     t.boolean  "is_dead",                default: false
-    t.integer  "action_type"
+    t.string   "action_type"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
@@ -70,7 +70,7 @@ ActiveRecord::Schema.define(version: 20170220102019) do
     t.integer  "day_time"
     t.integer  "night_time"
     t.integer  "vote_time"
-    t.integer  "action_type"
+    t.string   "action_type"
   end
 
   create_table "votes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

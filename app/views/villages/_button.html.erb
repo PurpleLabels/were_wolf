@@ -1,0 +1,10 @@
+
+<% if current_user.action_type == 'no_Game' %>
+<%= link_to "ゲーム開始", start_villages_path(@village),
+                                class: "waves-effect waves-light btn-large", remote: true%>
+<% elsif current_user.action_type == 'day' %>
+<%= link_to "投票へ移る", to_vote_villages_path(village_id:@village.id),
+                                class: "waves-effect waves-light btn-large", remote: true%>
+<% elsif current_user.action_type == 'wait' %>
+他のプレイヤーが入力中です。
+<% end %>

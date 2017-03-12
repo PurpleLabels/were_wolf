@@ -2,64 +2,19 @@ class VillagesController < ApplicationController
   def reload
     @users = User.where('village_id = ' + params[:village_id].to_s)
     @village = Village.find(params[:village_id])
-    @villageSettings = VillageSetting.joins(:job).select('village_settings.*,jobs.*').where('village_id = ' + params[:village_id])
-    day = 0
-    night = 0
-    wait = 0
-    vote = 0
-    dead = 0
-    @users.each do |user|
-      if user.is_dead
-        dead += 1
-      elsif user.action_type == 0
-        wait += 1
-      elsif user.action_type == 1
-        day += 1
-      elsif user.action_type == 2
-        night += 1
-      elsif user.action_type == 3
-        vote += 1
-      end
-    end
-
-    if @village.action_type == 7
-      @village.action_type = 2
-      @village.save
-      ActionCable.server.broadcast "village:#{@village.id}", count: @users.count, Action: 'show', village_id: @village.id.to_s, user_id: current_user.id
-    elsif @users.count == wait + dead && @village.action_type == 2
-      @votes = Vote.where(village_id: params[:village_id]).group(:voted_user).order('count_voted_user asc').count('voted_user').keys
-      # @votes = Vote.where(village_id: params[:village_id]).order('voted_user')
-      message = "全員の夜のアクションが終わりました。\n"
-      message = message + '昨晩の犠牲者は' + kill(@village.id.to_s) + "さんです。\n"
-      message += judge(@village.id.to_s)
-      Vote.destroy_all('village_id = ' + current_user.village_id.to_s)
-      @users.each do |user|
-        user.action_type = 1
-        user.save
-      end
-      @village.action_type = 1
-      @village.save
-
-      ActionCable.server.broadcast "village:#{@village.id}", count: @users.count, Action: 'night', village_id: @village.id.to_s, message: message
-    elsif @users.count == wait + dead && @village.action_type == 3
-      @users.each do |user|
-        user.action_type = 2
-        user.save
-      end
-      @village.action_type = 2
-      @village.save
-      message = "全員の投票が終わりました。\n本日の処刑対象は" + voteingResult(@village.id.to_s) + "さんです。\n"
-      message += judge(@village.id.to_s)
-      ActionCable.server.broadcast "village:#{@village.id}", count: @users.count, Action: 'night', village_id: @village.id.to_s, message: message, user_id: current_user.id
-    elsif @users.count == wait + dead && @village.action_type == 5
-      @village.action_type = 0
-      @village.save
-      message = 'ゲームを終了します。'
-      ActionCable.server.broadcast "village:#{@village.id}", count: @users.count, Action: 'stop', village_id: @village.id.to_s, message: message, user_id: current_user.id
-    elsif @village.action_type == 6
-      @village.action_type = 3
-      @village.save
-      ActionCable.server.broadcast "village:#{@village.id}", count: @users.count, Action: 'to_vote', village_id: @village.id.to_s, message: message, user_id: current_user.id
+    @villageSettings = VillageSetting.joins(:job)
+                                     .select('village_settings.*,jobs.*')
+                                     .where('village_id = ' + params[:village_id])
+    action = get_action(@users, @village)
+    set_action(@users, @village, action)
+    message = get_message(@users, @village, action)
+    if action != 'reload'
+      ActionCable.server.broadcast "village:#{@village.id}",
+                                   count: @users.count,
+                                   Action: action,
+                                   village_id: @village.id.to_s,
+                                   message: message,
+                                   user_id: current_user.id
     end
   end
 
@@ -67,7 +22,7 @@ class VillagesController < ApplicationController
     @villageSettings = VillageSetting.where('village_id = ' + params[:format] + ' and num <> 0')
     @villageSettings = @villageSettings.shuffle
     @village = Village.find(params[:format])
-    @village.action_type = 7
+    @village.action_type = 'start'
     @village.save
     @users = User.where('village_id = ' + params[:format])
     i = 0
@@ -75,21 +30,21 @@ class VillagesController < ApplicationController
     @users.each do |user|
       j = @villageSettings[i].num if j == 0
       user.job_id = @villageSettings[i].job_id
-      user.action_type = 2
+      user.action_type = 'night'
       user.is_dead = false
       user.save
       j -= 1
       i += 1 if j == 0
     end
     Vote.destroy_all('village_id = ' + current_user.village_id.to_s)
-    @villageSettings = VillageSetting.joins(:job).select('village_settings.*,jobs.*').where('village_id = ' + params[:format])
-
-    # ActionCable.server.broadcast "village:#{params[:format]}",village_id:params[:format]
+    @villageSettings = VillageSetting.joins(:job)
+                                     .select('village_settings.*,jobs.*')
+                                     .where('village_id = ' + params[:format])
     redirect_to action: 'reload', village_id: current_user.village_id
   end
 
   def day
-    getUser(params[:format])
+    get_user(params[:format])
   end
 
   def night
@@ -107,7 +62,7 @@ class VillagesController < ApplicationController
         @vote.save
       end
     end
-    current_user.action_type = 0
+    current_user.action_type = 'wait'
     current_user.save
     redirect_to action: 'reload', village_id: current_user.village_id
   end
@@ -115,11 +70,11 @@ class VillagesController < ApplicationController
   def to_vote
     @users = User.where('village_id = ' + params[:village_id])
     @users.each do |user|
-      user.action_type = 3
+      user.action_type = 'vote'
       user.save
     end
     @village = Village.find(params[:village_id])
-    @village.action_type = 6
+    @village.action_type = 'to_Vote'
     @village.save
     redirect_to action: 'reload', village_id: current_user.village_id
   end
@@ -132,7 +87,7 @@ class VillagesController < ApplicationController
     @vote.voted_user = params[:user_id]
     @vote.save
 
-    current_user.action_type = 0
+    current_user.action_type = 'wait'
     current_user.save
 
     redirect_to action: 'reload', village_id: current_user.village_id
@@ -141,12 +96,12 @@ class VillagesController < ApplicationController
   def stop
     @users = User.where('village_id = ' + params[:format])
     @village = Village.find(params[:format])
-    @village.action_type = 5
+    @village.action_type = 'stop'
     @village.save
     @villageSettings = VillageSetting.joins(:job).select('village_settings.*,jobs.*').where('village_id = ' + params[:format])
     @users.each do |user|
       user.job_id = 1
-      user.action_type = 0
+      user.action_type = 'wait'
       user.save
     end
     redirect_to action: 'reload', village_id: current_user.village_id
@@ -154,10 +109,9 @@ class VillagesController < ApplicationController
 
   def show
     @village = Village.find(params[:id])
-    @user = User.find(current_user.id)
-    @user.village_id = @village.id
-    @user.action_type = 0
-    @user.save
+    current_user.village_id = @village.id
+    current_user.action_type = 'no_Game'
+    current_user.save
     @users = User.where('village_id = ' + params[:id])
     # @villageSettings = VillageSetting.joins("INNER JOIN jobs ON village_settings.job_id = jobs.id").select('village_settings.*,jobs.*').where("village_id = "+params[:id] )
     @villageSettings = VillageSetting.joins(:job).select('village_settings.*,jobs.*').where('village_id = ' + params[:id])
@@ -191,7 +145,7 @@ class VillagesController < ApplicationController
     @village.day_time = 2
     @village.night_time = 60
     @village.vote_time = 20
-    @village.action_type = 0
+    @village.action_type = 'no_Game'
     @village.save
 
     @jobs = Job.all
@@ -201,62 +155,66 @@ class VillagesController < ApplicationController
       vs.save
     end
 
-    @user = User.find(current_user.id)
-    @user.village_id = @village.id
-    @user.is_admin = true
+    current_user.village_id = @village.id
+    current_user.is_admin = true
 
-    @user.save
+    current_user.save
     flash[:success] = 'village created!'
     redirect_to action: 'show', id: @village.id
   end
 
   def search
     @villages = Village.all
-    @user = User.find(current_user.id)
-    @village_id = @user.village_id
+    @village_id = current_user.village_id
 
     unless @village_id.nil?
       @users = User.where('village_id = ' + @village_id.to_s)
       if @users.count == 1
-        Village.destroy(@user.village_id)
+        Village.destroy(current_user.village_id)
+        current_user.update(village_id: nil, is_admin: false)
         @users.update_all(village_id: nil, is_admin: false)
-
       else
-        if @user.is_admin
+        if current_user.is_admin
           @remains = User.where('village_id = ' + @village_id.to_s + ' and is_admin = false')
           @remains.first.update(is_admin: true)
           @remains.first.save
         end
-        @user.update(village_id: nil, is_admin: false)
-        @user.save
+        current_user.update(village_id: nil, is_admin: false)
+        current_user.save
         # @rr = ApplicationController.renderer.render(@users)
-        ActionCable.server.broadcast "village:#{@village_id}", count: @users.count, village_id: @village_id.to_s, Action: 'show', user_id: current_user.id
+        ActionCable.server.broadcast "village:#{@village_id}",
+                                     count: @users.count,
+                                     village_id: @village_id.to_s,
+                                     Action: 'reload',
+                                     message: '',
+                                     user_id: current_user.id
       end
     end
   end
 
   private
 
-  def getUser(village_id)
+  def get_user(village_id)
     @users = User.where('village_id = ' + village_id)
   end
 
-  private
-
-  def judge(village_id)
-    @users = User.where('village_id = ' + village_id)
-    villagerCount = @users.where("is_dead = false and job_id <> '1'").count
-    wereWolfCount = @users.where("is_dead = false and job_id = '1'").count
+  def judge(users, village)
+    villagerCount = users.where("is_dead = false and job_id <> '1'").count
+    wereWolfCount = users.where("is_dead = false and job_id = '1'").count
     if wereWolfCount == 0
+      village.action_type = 'no_Game'
+      village.save
+      set_user_action(users, 'no_Game')
       return '村人チームの勝利です。'
     elsif villagerCount <= wereWolfCount
+      village.action_type = 'no_Game'
+      village.save
+      set_user_action(users, 'no_Game')
       return '人狼チームの勝利です。'
     else
       return '人狼はまだ潜んでいます。'
     end
   end
-
-  private
 
   def kill(village_id)
     @votes = Vote.where(village_id: village_id).group(:voted_user).order('count_voted_user desc').count('voted_user').keys
@@ -267,14 +225,80 @@ class VillagesController < ApplicationController
     target_user[0].name
   end
 
-  private
-
-  def voteingResult(village_id)
-    @votes = Vote.where(village_id: village_id).group(:voted_user).order('count_voted_user desc').count('voted_user').keys
+  def voteing_result(village_id)
+    @votes = Vote.where(village_id: village_id)
+                 .group(:voted_user)
+                 .order('count_voted_user desc')
+                 .count('voted_user').keys
     target_user = User.where('id = ' + @votes[0].to_s)
     target_user[0].is_dead = true
     target_user[0].save
     Vote.destroy_all('village_id = ' + village_id)
     target_user[0].name
+  end
+
+  def get_action(users, village)
+    wait = 0
+    users.each do |user|
+      wait += 1 if user.is_dead || user.action_type == 'wait'
+    end
+
+    if users.count == wait && village.action_type == 'night'
+      return 'end_Night'
+    elsif users.count == wait && village.action_type == 'vote'
+      return 'end_Vote'
+    elsif users.count == wait && village.action_type == 'stop'
+      return 'end_Game'
+    elsif village.action_type == 'to_Vote'
+      return 'to_Vote'
+    elsif village.action_type == 'start'
+      return 'start'
+    else
+      return 'reload'
+    end
+  end
+
+  def get_message(users, village, action)
+    message = ''
+    case action
+    when 'end_Night'
+      message = "全員の夜のアクションが終わりました。\n"
+      message = message + '昨晩の犠牲者は' + kill(village.id.to_s) + "さんです。\n"
+      message += judge(users, village)
+    when 'end_Vote'
+      message = "全員の投票が終わりました。\n本日の処刑対象は" + voteing_result(village.id.to_s) + "さんです。\n"
+      message += judge(users, village)
+    when 'end_Game'
+      message = 'ゲームを終了します。'
+    when 'to_Vote'
+      message = '投票の時間です。'
+    end
+    message
+  end
+
+  def set_action(users, village, action)
+    case action
+    when 'start'
+      village.action_type = 'night'
+    when 'end_Night'
+      village.action_type = 'day'
+      set_user_action(users, 'day')
+    when 'end_Vote'
+      village.action_type = 'night'
+      set_user_action(users, 'night')
+    when 'end_Game'
+      village.action_type = 'no_Game'
+      set_user_action(users, 'no_Game')
+    when 'to_Vote'
+      village.action_type = 'vote'
+    end
+    village.save
+  end
+
+  def set_user_action(users, action)
+    users.each do |user|
+      user.action_type = action
+      user.save
+    end
   end
 end

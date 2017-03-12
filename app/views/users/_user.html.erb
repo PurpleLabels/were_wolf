@@ -4,9 +4,7 @@
     <%= user.name %>
     <div  class="secondary-content">
     <!--　村画面の場合 -->
-    <% if current_user.action_type == 0 %>
-        待機中
-    <% else %>
+    <% if !(current_user.action_type == 'wait' ||current_user.action_type == 'no_Game')%>
         <!-- 死亡の場合 -->
         <% if user.is_dead %>
             死亡
@@ -22,11 +20,11 @@
             <%= Job.find(current_user.job_id).name  %>
         <% else %>
             <!--　昼画面の場合 -->
-            <% if current_user.action_type == 1 %>
-              生存
+            <% if current_user.action_type == 'day' %>
+
             <% end %>
             <!--　夜画面の場合 -->
-            <% if current_user.action_type == 2 %>
+            <% if current_user.action_type == 'night' %>
 
 
                     <!--　夜画面の場合　人狼 -->
@@ -58,7 +56,7 @@
 
             <% end %>
             <!--　投票画面の場合 -->
-            <% if current_user.action_type == 3 && !current_user.is_dead%>
+            <% if current_user.action_type == 'vote' && !current_user.is_dead%>
                 <%= link_to "投票", vote_villages_path(user_id:user.id), remote: true%>
             <% end %>
         <% end %>
