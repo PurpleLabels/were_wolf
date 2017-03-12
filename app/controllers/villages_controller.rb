@@ -28,13 +28,13 @@ class VillagesController < ApplicationController
     i = 0
     j = 0
     @users.each do |user|
-      j = @villageSettings[i].num if j == 0
+      j = @villageSettings[i].num if j.zero?
       user.job_id = @villageSettings[i].job_id
       user.action_type = 'night'
       user.is_dead = false
       user.save
       j -= 1
-      i += 1 if j == 0
+      i += 1 if j.zero?
     end
     Vote.destroy_all('village_id = ' + current_user.village_id.to_s)
     @villageSettings = VillageSetting.joins(:job)
@@ -201,7 +201,7 @@ class VillagesController < ApplicationController
   def judge(users, village)
     villagerCount = users.where("is_dead = false and job_id <> '1'").count
     wereWolfCount = users.where("is_dead = false and job_id = '1'").count
-    if wereWolfCount == 0
+    if wereWolfCount.zero?
       village.action_type = 'no_Game'
       village.save
       set_user_action(users, 'no_Game')

@@ -1,23 +1,23 @@
 <div style="text-align: center;">
-<% if signed_in? %>
-<div style=" padding: 30px;">
+  <% if signed_in? %>
+  <div style=" padding: 30px;">
     <%= link_to "村に入る", search_villages_path,
                                 class: "waves-effect waves-light btn-large"%>
-</div>
-<div style=" padding: 30px;">
+  </div>
+  <div style=" padding: 30px;">
     <%= link_to "村を作成する", new_village_path ,
                                 class: "waves-effect waves-light btn-large"%>
-</div>
+  </div>
 <% else %>
-<div style=" padding: 30px;">
+  <div style=" padding: 30px;">
 
     <%= link_to "Sign in", new_user_session_path,
                                 class: "waves-effect waves-light btn-large" %>
-</div>
-<div style=" padding: 30px;">
+  </div>
+  <div style=" padding: 30px;">
     <%= link_to "Sign up now!", new_user_registration_path,
                                 class: "waves-effect waves-light btn-large" %>
-</div>
+  </div>
 
-<% end %>
+  <% end %>
 </div>

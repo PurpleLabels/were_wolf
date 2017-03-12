@@ -3,37 +3,41 @@
 <nav>
   <div class="nav-wrapper container">
     <%= link_to "人狼", root_path, id: "logo",class:"brand-logo" %>
-    <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+    <a href="#" data-activates="mobile-demo" class="button-collapse">
+      <i class="material-icons">menu</i>
+    </a>
 
     <ul class="right hide-on-med-and-down">
       <li><%= link_to "Home", root_path %></li>
       <li><%= link_to "Help", help_path %></li>
       <% if signed_in? %>
-          <% if current_user.village_id%>
-          <li><%= link_to "ゲーム終了", stop_villages_path(@village),remote: true%></li>
-          <li><%= link_to "リロード", reload_villages_path(village_id:@village.id), remote: true,id:"reload"%><li>
-          <li><%= link_to "退出", search_villages_path %></li>
-          <% end %>
-          <!-- <li><%= link_to "Profile", current_user %></li> -->
-          <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
-      <% else %>
-          <li><%= link_to "Sign in", new_user_session_path %></li>
+      <% if current_user.village_id%>
+      <li><%= link_to "ゲーム終了", stop_villages_path(@village),remote: true%></li>
+      <li><%= link_to "リロード", reload_villages_path(village_id:@village.id), remote: true,id:"reload"%>
+      <li>
+      <li><%= link_to "退出", search_villages_path %></li>
+      <% end %>
+      <!-- <li><%= link_to "Profile", current_user %></li> -->
+      <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
+    <% else %>
+      <li><%= link_to "Sign in", new_user_session_path %></li>
       <% end %>
     </ul>
     <ul class="side-nav" id="mobile-demo">
       <li><%= link_to "Home", root_path %></li>
       <li><%= link_to "Help", help_path %></li>
       <% if signed_in? %>
-          <% if @village %>
-          <li><%= link_to "ゲーム終了", stop_villages_path(@village),remote: true%></li>
-          <li><%= link_to "リロード", reload_villages_path(village_id:@village.id), remote: true,id:"reload"%><li>
-          <li><%= link_to "退出", search_villages_path %></li>
-          <% end %>
-          <!-- <li><%= link_to "Profile", current_user %></li> -->
-          <li class="divider"></li>
-          <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
-      <% else %>
-          <li><%= link_to "Sign in", new_user_session_path %></li>
+      <% if @village %>
+      <li><%= link_to "ゲーム終了", stop_villages_path(@village),remote: true%></li>
+      <li><%= link_to "リロード", reload_villages_path(village_id:@village.id), remote: true,id:"reload"%>
+      <li>
+      <li><%= link_to "退出", search_villages_path %></li>
+      <% end %>
+      <!-- <li><%= link_to "Profile", current_user %></li> -->
+      <li class="divider"></li>
+      <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
+    <% else %>
+      <li><%= link_to "Sign in", new_user_session_path %></li>
       <% end %>
     </ul>
   </div>

@@ -1,65 +1,56 @@
-
 <li class="collection-item user">
-
-    <%= user.name %>
-    <div  class="secondary-content">
+  <%= user.name %>
+  <div  class="secondary-content">
     <!--　村画面の場合 -->
     <% if !(current_user.action_type == 'wait' ||current_user.action_type == 'no_Game')%>
-        <!-- 死亡の場合 -->
-        <% if user.is_dead %>
-            死亡
-            <% if current_user.job_id == 5 %>
+      <!-- 死亡の場合 -->
+      <% if user.is_dead %>
+        死亡
+        <% if current_user.job_id == 5 %>
+          <% if user.job_id == 1 %>
+            人狼
+          <% else %>
+            人間
+          <% end %>
+        <% end %>
+      <!-- 自分の場合 -->
+      <% elsif user.id == current_user.id  %>
+        <%= Job.find(current_user.job_id).name  %>
+      <% else %>
+        <!--　昼画面の場合 -->
+        <% if current_user.action_type == 'day' %>
+        <% end %>
+        <!--　夜画面の場合 -->
+        <% if current_user.action_type == 'night' %>
+          <!--　夜画面の場合　人狼 -->
+          <% if current_user.is_dead %>
+            <% elsif current_user.job_id == 1 %>
               <% if user.job_id == 1 %>
                 人狼
               <% else %>
-                人間
+                <%= link_to "弱", night_villages_path(user_id:user.id,level:1), remote: true, class: ""%>
+                <%= link_to "中", night_villages_path(user_id:user.id,level:2), remote: true%>
+                <%= link_to "強", night_villages_path(user_id:user.id,level:3), remote: true%>
               <% end %>
+            <!--　夜画面の場合　占い師 -->
+            <% elsif current_user.job_id == 3 %>
+                <%= link_to "占う", night_villages_path(user.id), remote: true, onclick:"reading(" + user.id.to_s + ",'" + user.name  + "'," + user.job_id.to_s + ")"%>
+            <!--　夜画面の場合　騎士 -->
+            <% elsif current_user.job_id == 4 %>
+
+            <!--　夜画面の場合　霊媒師 -->
+            <% elsif current_user.job_id == 5 %>
+            <%= link_to "疑う", night_villages_path(user.id), remote: true%>
+            <!--　夜画面の場合　村人　狂人 -->
+            <% else %>
+            <%= link_to "疑う", night_villages_path(user.id), remote: true%>
             <% end %>
-        <!-- 自分の場合 -->
-        <% elsif user.id == current_user.id  %>
-            <%= Job.find(current_user.job_id).name  %>
-        <% else %>
-            <!--　昼画面の場合 -->
-            <% if current_user.action_type == 'day' %>
-
-            <% end %>
-            <!--　夜画面の場合 -->
-            <% if current_user.action_type == 'night' %>
-
-
-                    <!--　夜画面の場合　人狼 -->
-                    <% if current_user.is_dead %>
-
-                    <% elsif current_user.job_id == 1 %>
-
-
-                        <% if user.job_id == 1 %>
-                            人狼
-                        <% else %>
-                        <%= link_to "弱", night_villages_path(user_id:user.id,level:1), remote: true, class: ""%>
-                        <%= link_to "中", night_villages_path(user_id:user.id,level:2), remote: true%>
-                        <%= link_to "強", night_villages_path(user_id:user.id,level:3), remote: true%>
-                        <% end %>
-                    <!--　夜画面の場合　占い師 -->
-                    <% elsif current_user.job_id == 3 %>
-                        <%= link_to "占う", night_villages_path(user.id), remote: true, onclick:"reading(" + user.id.to_s + ",'" + user.name  + "'," + user.job_id.to_s + ")"%>
-                    <!--　夜画面の場合　騎士 -->
-                    <% elsif current_user.job_id == 4 %>
-
-                    <!--　夜画面の場合　霊媒師 -->
-                    <% elsif current_user.job_id == 5 %>
-                    <%= link_to "疑う", night_villages_path(user.id), remote: true%>
-                    <!--　夜画面の場合　村人　狂人 -->
-                    <% else %>
-                    <%= link_to "疑う", night_villages_path(user.id), remote: true%>
-                    <% end %>
-
-            <% end %>
-            <!--　投票画面の場合 -->
-            <% if current_user.action_type == 'vote' && !current_user.is_dead%>
-                <%= link_to "投票", vote_villages_path(user_id:user.id), remote: true%>
-            <% end %>
+          <% end %>
+        <!--　投票画面の場合 -->
+        <% if current_user.action_type == 'vote' && !current_user.is_dead%>
+          <%= link_to "投票", vote_villages_path(user_id:user.id), remote: true%>
         <% end %>
+      <% end %>
     <% end %>
-    </div>
+  </div>
 </li>

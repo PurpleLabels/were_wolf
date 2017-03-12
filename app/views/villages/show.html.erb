@@ -7,7 +7,7 @@
 		<ul class="tabs">
 			<li class="tab col s3">
 				<a class="active" href="#test1">
-					<span id ="count">
+					<span id="count">
 						<%= @users.count%>
 					</span>Players
 				</a>
@@ -18,33 +18,45 @@
 		</ul>
 	</div>
 	<div id="test1" class="col s12">
-		<ul class="collection users" id ="users">
+		<ul class="collection users" id="users">
 			<%= render @users %>
 		</ul>
 	</div>
 	<div id="test2" class="col s12">
-		<ul class="collection with-header" id ="settings">
+		<ul class="collection with-header" id="settings">
 			<li class="collection-header">設置時間</li>
 			<%= form_for @village do |f| %>
-			<li class="collection-item">昼　議論の時間
+			<li class="collection-item">昼 議論の時間
 				<div class="secondary-content">
-					<a class="plusminus" onclick="minus('#village_day_time')">　-　</a>
+					<a class="plusminus" onclick="minus('#village_day_time')">
+						-
+					</a>
 					<%= text_field_tag 'village[day_time]', @village.day_time, class: "setting", readonly:"readonly"%>m
-					<a class="plusminus" onclick="plus('#village_day_time')">　+　</a>
+					<a class="plusminus" onclick="plus('#village_day_time')">
+						+
+					</a>
 				</div>
 			</li>
-			<li class="collection-item">夜　アクションの時間
+			<li class="collection-item">夜 アクションの時間
 				<div class="secondary-content">
-					<a onclick="minus('#village_night_time')">　-　</a>
+					<a onclick="minus('#village_night_time')">
+						-
+					</a>
 					<%= text_field_tag 'village[night_time]', @village.night_time, class: "setting", readonly:"readonly"%>s
-					<a onclick="plus('#village_night_time')">　+　</a>
+					<a onclick="plus('#village_night_time')">
+						+
+					</a>
 				</div>
 			</li>
 			<li class="collection-item">投票時間
 				<div class="secondary-content">
-					<a onclick="minus('#village_vote_time')">　-　</a>
+					<a onclick="minus('#village_vote_time')">
+						-
+					</a>
 					<%= text_field_tag 'village[vote_time]', @village.vote_time, class: "setting", readonly:"readonly"%>s
-					<a onclick="plus('#village_vote_time')">　+　</a>
+					<a onclick="plus('#village_vote_time')">
+						+
+					</a>
 				</div>
 			</li>
 
@@ -53,9 +65,13 @@
 			<%= f.fields_for :villageSetting do |h|%>
 			<li class="collection-item"><%= villageSetting.name %>
 				<div class="secondary-content">
-					<a onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">　-　</a>
+					<a onclick="minus('#<%= " job" + villageSetting.job_id.to_s %>')">
+						-
+					</a>
 					<%= text_field_tag 'villageSetting[num]'+villageSetting.job_id.to_s, villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
-					<a onclick="plus('#<%= "job" + villageSetting.job_id.to_s %>')">　+　</a>
+					<a onclick="plus('#<%= " job" + villageSetting.job_id.to_s %>')">
+						+
+					</a>
 				</div>
 			</li>
 			<% end %>
@@ -68,49 +84,44 @@
 	</div>
 </div>
 <div id="button" style="text-align: center;">
-<%= render :partial => "button" %>
+	<%= render :partial => "button" %>
 </div>
 <script type="text/javascript">
 
+	$(function () {
+		$('ul.tabs').tabs('select_tab', 'tab_id');
+		App.room.in_out('<%= @village.id %>');
 
-$(function() {
-  $('ul.tabs').tabs('select_tab', 'tab_id');
-  App.room.in_out('<%= @village.id %>');
+	});
 
-});
-
-function plus(id){
-    $(id).val(parseInt($(id).val()) + 1);
-    calc();
-}
-function minus(id){
-    $(id).val(parseInt($(id).val()) - 1);
-    calc();
-}
-
-function calc(){
-
-   var total = parseInt($("#count").html());
-   $("#job2").val(total
-   <% @villageSettings.each do |villageSetting| %>
-     <% if villageSetting.job_id != 2 %>
-     - parseInt($("#<%= "job" + villageSetting.job_id.to_s %>").val())
-     <% end %>
-   <% end %>
-    )
-   //$("#villager").val(total - parseInt($("#werewolf").val()) - parseInt($("#fortuneteller").val()) - parseInt($("#knight").val()) - parseInt($("#priest").val()) - parseInt($("#madman").val()));
-}
-function reload(village_id,user_id){
-	if (<%= current_user.id %> != user_id) {
-		$('#reload').click();
+	function plus(id) {
+		$(id).val(parseInt($(id).val()) + 1);
+		calc();
 	}
-}
+	function minus(id) {
+		$(id).val(parseInt($(id).val()) - 1);
+		calc();
+	}
 
-function reading(user_id,user_name,job){
-    if (job=='1') {
-         alert(user_name+"さんは人狼です。");
-    } else {
-        alert(user_name+"さんは人間です。");
-    }
-}
+	function calc() {
+
+		var total = parseInt($("#count").html());
+		$("#job2").val(total <% @villageSettings.each do |villageSetting| %>
+		<% if villageSetting.job_id != 2 %> - parseInt($("#<%= "job" + villageSetting.job_id.to_s %>").val())<% end %>
+		<% end %>)
+		//$("#villager").val(total - parseInt($("#werewolf").val()) - parseInt($("#fortuneteller").val()) - parseInt($("#knight").val()) - parseInt($("#priest").val()) - parseInt($("#madman").val()));
+	}
+	function reload(village_id, user_id) {
+		if (<%= current_user.id %> != user_id) {
+			$('#reload').click();
+		}
+	}
+
+	function reading(user_id, user_name, job) {
+		if (job == '1') {
+			alert(user_name + "さんは人狼です。");
+		} else {
+			alert(user_name + "さんは人間です。");
+		}
+	}
 </script>
