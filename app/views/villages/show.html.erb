@@ -65,11 +65,11 @@
 			<%= f.fields_for :villageSetting do |h|%>
 			<li class="collection-item"><%= villageSetting.name %>
 				<div class="secondary-content">
-					<a onclick="minus('#<%= " job" + villageSetting.job_id.to_s %>')">
+					<a onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">
 						-
 					</a>
 					<%= text_field_tag 'villageSetting[num]'+villageSetting.job_id.to_s, villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
-					<a onclick="plus('#<%= " job" + villageSetting.job_id.to_s %>')">
+					<a onclick="plus('#<%= "job" + villageSetting.job_id.to_s %>')">
 						+
 					</a>
 				</div>

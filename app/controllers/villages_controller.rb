@@ -120,6 +120,7 @@ class VillagesController < ApplicationController
     @village_settings = VillageSetting.joins(:job)
                                       .select('village_settings.*,jobs.*')
                                       .where(village_id: params[:id])
+                                      .order('job_id asc')
   end
 
   def update
