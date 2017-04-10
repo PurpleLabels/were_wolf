@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170326023550) do
+ActiveRecord::Schema.define(version: 20170410053357) do
 
   create_table "jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -65,13 +65,13 @@ ActiveRecord::Schema.define(version: 20170326023550) do
   create_table "villages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
     t.string   "password"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-    t.boolean  "is_played"
-    t.integer  "day_time"
-    t.integer  "night_time"
-    t.integer  "vote_time"
-    t.string   "action_type"
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.boolean  "is_played",   default: false
+    t.integer  "day_time",    default: 2
+    t.integer  "night_time",  default: 60
+    t.integer  "vote_time",   default: 20
+    t.string   "action_type", default: "no_Game"
   end
 
   create_table "votes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
