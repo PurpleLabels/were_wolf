@@ -2,8 +2,9 @@ class VillagesController < ApplicationController
   include Common
   def show
     @village = Village.find(params[:id])
-    enter(@village.id)
+    current_user.update(village_id: params[:id], action_type: 'no_Game')
     @users = User.where(village_id: params[:id])
+    #selectが気になる
     @village_settings = VillageSetting.joins(:job)
                                       .select('village_settings.*,jobs.*')
                                       .where(village_id: params[:id])
@@ -34,30 +35,17 @@ class VillagesController < ApplicationController
 
   def search
     @villages = Village.all
-    exit(current_user.village_id) unless current_user.village_id.nil?
+    exit(current_user.village_id) if current_user.village_id
   end
 
   def reload
     @users = User.where(village_id: params[:village_id])
     @village = Village.find(params[:village_id])
-    # TODO: YAGUNI
-    # @village_settings = VillageSetting.joins(:job)
-    #                                  .select('village_settings.*,jobs.*')
-    #                                  .where(village_id: params[:village_id])
-    action = get_action(@users, @village)
-    number_allive = @users.where(is_dead: false).count
-    message = get_message(@users, @village, action)
-
-    if action == 'end_Vote' && @users.where(is_dead: false).count == number_allive
-      action = 'Re_Vote'
-    end
-    set_action(@users, @village, action)
-    if action != 'reload'
+    if params[:taget] == 'all'
       ActionCable.server.broadcast "village:#{@village.id}",
                                    count: @users.count,
-                                   Action: action,
                                    village_id: @village.id.to_s,
-                                   message: message,
+                                   message: params[:message],
                                    user_id: current_user.id
     end
   end
