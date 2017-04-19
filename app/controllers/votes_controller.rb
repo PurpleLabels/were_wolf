@@ -1,6 +1,6 @@
 class VotesController < ApplicationController
+  #未使用です
   def new
-    byebug
     users = User.where(village_id: params[:village_id])
     users.update_all(action_type: 'vote')
     village = Village.find(params[:village_id])
