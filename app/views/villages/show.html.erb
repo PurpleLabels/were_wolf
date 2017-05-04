@@ -1,91 +1,80 @@
-<% provide(:title, '村') %>
-<h3>
-	<%= @village.name %>
-</h3>
-<div class="row card">
-	<div class="">
-		<ul class="tabs">
-			<li class="tab col s3">
-				<a class="active" href="#test1">
-					<span id="count">
-						<%= @users.count%>
-					</span>Players
-				</a>
-			</li>
-			<li class="tab col s3">
-				<a href="#test2">Settings</a>
-			</li>
-		</ul>
-	</div>
-	<div id="test1" class="col s12">
-		<ul class="collection users" id="users">
-			<%= render @users %>
-		</ul>
-	</div>
-	<div id="test2" class="col s12">
-		<ul class="collection with-header" id="settings">
-			<li class="collection-header">設置時間</li>
-			<%= form_for @village do |f| %>
-			<li class="collection-item">昼 議論の時間
-				<div class="secondary-content">
-					<a class="plusminus" onclick="minus('#village_day_time')">
-						-
-					</a>
-					<%= text_field_tag 'village[day_time]', @village.day_time, class: "setting", readonly:"readonly"%>m
-					<a class="plusminus" onclick="plus('#village_day_time')">
-						+
-					</a>
-				</div>
-			</li>
-			<li class="collection-item">夜 アクションの時間
-				<div class="secondary-content">
-					<a onclick="minus('#village_night_time')">
-						-
-					</a>
-					<%= text_field_tag 'village[night_time]', @village.night_time, class: "setting", readonly:"readonly"%>s
-					<a onclick="plus('#village_night_time')">
-						+
-					</a>
-				</div>
-			</li>
-			<li class="collection-item">投票時間
-				<div class="secondary-content">
-					<a onclick="minus('#village_vote_time')">
-						-
-					</a>
-					<%= text_field_tag 'village[vote_time]', @village.vote_time, class: "setting", readonly:"readonly"%>s
-					<a onclick="plus('#village_vote_time')">
-						+
-					</a>
-				</div>
-			</li>
+<% provide(:title, @village.name) %>
+<ul class="collapsible" data-collapsible="expandable">
+    <li>
+      <div class="collapsible-header active"><i class="material-icons">supervisor_account</i><span id="count"><%= @users.count%></span> Players</div>
+      <div class="collapsible-body">
+				<ul class="collection" id="users">
+					<%= render @users %>
+				</ul>
+			</div>
+    </li>
+    <li>
+      <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
+      <div class="collapsible-body">
+				<ul class="collection with-header" id="settings">
+					<li class="collection-header">設置時間</li>
+					<%= form_for @village do |f| %>
+					<li class="collection-item">昼 議論の時間
+						<div class="secondary-content">
+							<a class="plusminus" onclick="minus('#village_day_time')">
+								-
+							</a>
+							<%= text_field_tag 'village[day_time]', @village.day_time, class: "setting", readonly:"readonly"%>m
+							<a class="plusminus" onclick="plus('#village_day_time')">
+								+
+							</a>
+						</div>
+					</li>
+					<li class="collection-item">夜 アクションの時間
+						<div class="secondary-content">
+							<a onclick="minus('#village_night_time')">
+								-
+							</a>
+							<%= text_field_tag 'village[night_time]', @village.night_time, class: "setting", readonly:"readonly"%>s
+							<a onclick="plus('#village_night_time')">
+								+
+							</a>
+						</div>
+					</li>
+					<li class="collection-item">投票時間
+						<div class="secondary-content">
+							<a onclick="minus('#village_vote_time')">
+								-
+							</a>
+							<%= text_field_tag 'village[vote_time]', @village.vote_time, class: "setting", readonly:"readonly"%>s
+							<a onclick="plus('#village_vote_time')">
+								+
+							</a>
+						</div>
+					</li>
 
-			<li class="collection-header">役職</li>
-			<% @village_settings.each do |villageSetting| %>
-			<%= f.fields_for :villageSetting do |h|%>
-			<li class="collection-item"><%= villageSetting.name %>
-				<div class="secondary-content">
-					<a onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">
-						-
-					</a>
-					<%= text_field_tag 'villageSetting[num]'+villageSetting.job_id.to_s, villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
-					<a onclick="plus('#<%= "job" + villageSetting.job_id.to_s %>')">
-						+
-					</a>
-				</div>
-			</li>
-			<% end %>
+					<li class="collection-header">役職</li>
+					<% @village_settings.each do |villageSetting| %>
+					<%= f.fields_for :villageSetting do |h|%>
+					<li class="collection-item"><%= villageSetting.name %>
+						<div class="secondary-content">
+							<a onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">
+								-
+							</a>
+							<%= text_field_tag 'villageSetting[num]'+villageSetting.job_id.to_s, villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
+							<a onclick="plus('#<%= "job" + villageSetting.job_id.to_s %>')">
+								+
+							</a>
+						</div>
+					</li>
+					<% end %>
 
-			<% end %>
-			<%= f.submit "設定", class: "waves-effect waves-light btn-large" %>
-		</ul>
+					<% end %>
+					<%= f.submit "設定", class: "waves-effect waves-light btn-large" %>
+				</ul>
 
-		<% end %>
+				<% end %>
+			</div>
+    </li>
+  </ul>
+	<div id="button" style="text-align: center;">
+		<%= render :partial => "button" %>
 	</div>
-</div>
-<div id="button" style="text-align: center;">
-	<%= render :partial => "button" %>
-</div>
 <script type="text/javascript">
 
 	$(function () {

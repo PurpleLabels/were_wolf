@@ -1,5 +1,10 @@
 @import "materialize/components/color";
+$primary-color: color("shades", "black") !default;
+$secondary-color: color("deep-purple", "base") !default;
+$link-color: color("light-blue", "darken-3") !default;
 @import 'materialize';
+
+p.resizeimage img { width: 100%; }
 
 input[type=text].setting {
   height: 1rem;
@@ -22,9 +27,14 @@ input[type=text].setting {
 }
 
 body > .container {
-  padding: 60px 15px 0;
+  /*padding: 60px 15px 0;*/
 }
-
+.container {
+   width: 100%;
+}
+.avatar {
+    min-height: 64px !important;;
+}
 .container .text-muted {
   margin: 20px 0;
 }

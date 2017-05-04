@@ -1,6 +1,8 @@
-<li class="collection-item user">
-  <%= user.name %>
+<li class="collection-item avatar">
+  <%=get_status(user)%>
+  <span class="title"><%= user.name %></span>
+  <br><%=get_job(user)%>
   <div  class="secondary-content">
-    <%=get_status(user)%>
+    <%=get_action(user)%>
   </div>
 </li>
