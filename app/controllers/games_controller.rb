@@ -15,7 +15,9 @@ class GamesController < ApplicationController
     current_user.update(action_type: 'wait')
     if check_all_input
       message = get_night_message
-      update_action_type('day')
+      if !message.include?('勝利です')
+        update_action_type('day')
+      end
       User.where(village_id: current_user.village_id)
           .update_all(is_protected: false)
       call_reload(message, 'all')
@@ -46,7 +48,9 @@ class GamesController < ApplicationController
         update_action_type('vote')
       else
         Message.destroy_all(village_id: current_user.village_id)
-        update_action_type('night')
+        if !message.include?('勝利です')
+          update_action_type('night')
+        end
       end
       call_reload(message, 'all')
     else
