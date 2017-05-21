@@ -1,4 +1,5 @@
 <% provide(:title, @village.name) %>
+<%= form_for(@village, remote: true) do |f| %>
 <ul class="collapsible" data-collapsible="expandable">
     <li>
       <div class="collapsible-header active"><i class="material-icons">supervisor_account</i><span id="count"><%= @users.count%></span> Players</div>
@@ -11,76 +12,42 @@
     <li>
       <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
       <div class="collapsible-body">
-				<ul class="collection with-header" id="settings">
-					<li class="collection-header">設置時間</li>
-					<%= form_for @village do |f| %>
-					<li class="collection-item">昼 議論の時間
-						<div class="secondary-content">
-							<a class="plusminus" onclick="minus('#village_day_time')">
-								-
-							</a>
-							<%= text_field_tag 'village[day_time]', @village.day_time, class: "setting", readonly:"readonly"%>m
-							<a class="plusminus" onclick="plus('#village_day_time')">
-								+
-							</a>
-						</div>
-					</li>
-					<li class="collection-item">夜 アクションの時間
-						<div class="secondary-content">
-							<a onclick="minus('#village_night_time')">
-								-
-							</a>
-							<%= text_field_tag 'village[night_time]', @village.night_time, class: "setting", readonly:"readonly"%>s
-							<a onclick="plus('#village_night_time')">
-								+
-							</a>
-						</div>
-					</li>
-					<li class="collection-item">投票時間
-						<div class="secondary-content">
-							<a onclick="minus('#village_vote_time')">
-								-
-							</a>
-							<%= text_field_tag 'village[vote_time]', @village.vote_time, class: "setting", readonly:"readonly"%>s
-							<a onclick="plus('#village_vote_time')">
-								+
-							</a>
-						</div>
-					</li>
-
-					<li class="collection-header">役職</li>
+				<ul class="collection" id="settings">
 					<% @village_settings.each do |villageSetting| %>
 					<%= f.fields_for :villageSetting do |h|%>
-					<li class="collection-item"><%= villageSetting.name %>
+					<li class="collection-item  avatar">
+            <%= get_job_icon(villageSetting.job_id)%>
+            <span class="title"><%= villageSetting.name %></span>
+            <br><span class="job_info"><%=get_job_info(villageSetting.job_id)%></span>
 						<div class="secondary-content">
-							<a onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">
-								-
+							<a class="waves-effect waves-light btn-floating" onclick="minus('#<%= "job" + villageSetting.job_id.to_s %>')">
+								<i class="Small material-icons">fast_rewind</i>
 							</a>
 							<%= text_field_tag 'villageSetting[num]'+villageSetting.job_id.to_s, villageSetting.num, class: "setting", readonly:"readonly", id:"job" + villageSetting.job_id.to_s %>人
-							<a onclick="plus('#<%= "job" + villageSetting.job_id.to_s %>')">
-								+
+							<a class="waves-effect waves-light btn-floating" onclick="plus('#<%= "job" + villageSetting.job_id.to_s %>')">
+								<i class="Small material-icons">fast_forward</i>
 							</a>
 						</div>
 					</li>
 					<% end %>
-
 					<% end %>
-					<%= f.submit "設定", class: "waves-effect waves-light btn-large" %>
 				</ul>
-
-				<% end %>
 			</div>
+
     </li>
   </ul>
 	<div id="button" style="text-align: center;">
-		<%= render :partial => "button" %>
+		<%= render "button" ,f:f %>
 	</div>
+  <%= render "watch" %>
+  <% end %>
 <script type="text/javascript">
-
+$('#watch').modal('open');
+$('#watch').modal('close');
 	$(function () {
-		$('ul.tabs').tabs('select_tab', 'tab_id');
+		change_button('<%= current_user.action_type %>')
 		App.room.in_out('<%= @village.id %>');
-
+    $('.modal').modal();
 	});
 
 	function plus(id) {
@@ -112,5 +79,35 @@
 		} else {
 			alert(user_name + "さんは人間です。");
 		}
+    disabled()
 	}
+
+  function disabled(){
+    $('.secondary-content.btn').addClass('disabled');
+  }
+
+  function change_button(action_type) {
+    if(action_type == 'no_Game') {
+      $('#start_button').css('display', 'inline');
+      $('#vote_button').css('display', 'none');
+      $('#wait_message').css('display', 'none');
+    } else if (action_type == 'day'){
+      $('#start_button').css('display', 'none');
+      $('#vote_button').css('display', 'inline');
+      $('#wait_message').css('display', 'none');
+    } else if (action_type == 'wait'){
+      $('#start_button').css('display', 'none');
+      $('#vote_button').css('display', 'none');
+      $('#wait_message').css('display', 'inline');
+    } else {
+      $('#start_button').css('display', 'none');
+      $('#vote_button').css('display', 'none');
+      $('#wait_message').css('display', 'none');
+    }
+	}
+
+  function aim(tweet) {
+    Materialize.toast(tweet, 2000);
+    //Materialize.toast(user_name + ':' + target +'を殺ろう!', 2000)
+  }
 </script>

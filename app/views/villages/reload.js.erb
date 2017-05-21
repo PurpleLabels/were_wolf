@@ -1,2 +1,5 @@
 $('#users').html('<%= j(render @users) %>')
-$('#button').html('<%= j(render :partial => "button") %>')
+change_button('<%= j(current_user.action_type) %>')
+<% if current_user.job_id == 1 && current_user.action_type == 'night' &&@tweet%>
+aim('<%= j(@tweet.content) %>')
+<% end %>

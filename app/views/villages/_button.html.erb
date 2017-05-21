@@ -1,9 +1,15 @@
-<% if current_user.action_type == 'no_Game' %>
+
+<div id="start_button" style="display:none;">
+<%= f.submit "ゲーム開始", class: "waves-effect waves-light btn-large" %>
+<span style="display:none;">
 <%= link_to "ゲーム開始", new_village_game_path(@village, village_id:@village.id),
-                                class: "waves-effect waves-light btn-large", remote: true%>
-<% elsif current_user.action_type == 'day' %>
+                                class: "waves-effect waves-light btn-large", remote: true, id:"start"%>
+</span>
+</div>
+<div id="vote_button" style="display:none;">
 <%= link_to "投票へ移る", to_vote_village_games_path(village_id:@village.id),
                                 class: "waves-effect waves-light btn-large", remote: true%>
-<% elsif current_user.action_type == 'wait' %>
+</div>
+<div id="wait_message" style="display:none;">
 他のプレイヤーが入力中です。
-<% end %>
+</div>

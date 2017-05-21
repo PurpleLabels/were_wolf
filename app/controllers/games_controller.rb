@@ -1,12 +1,13 @@
 class GamesController < ApplicationController
   include Common
   def new
-    update_action_type('night')
+    update_action_type_on_start('night')
     User.where(village_id: current_user.village_id)
         .update_all(is_protected: true)
-    set_job(params[:format])
+    set_job(current_user.village_id)
+    Message.destroy_all(village_id: current_user.village_id)
     Vote.destroy_all(village_id: current_user.village_id)
-    reload('ゲームを開始します。', 'all')
+    call_reload('ゲームを開始します。', 'all')
   end
 
   def night
@@ -17,20 +18,21 @@ class GamesController < ApplicationController
       update_action_type('day')
       User.where(village_id: current_user.village_id)
           .update_all(is_protected: false)
-      reload(message, 'all')
+      call_reload(message, 'all')
     else
-      reload(nil, 'myself')
+      call_reload(nil, 'myself')
     end
   end
 
   def stop
     update_action_type('no_Game')
-    reload('ゲームを終了します。', 'all')
+    Message.destroy_all(village_id: current_user.village_id)
+    call_reload('ゲームを終了します。', 'all')
   end
 
   def to_vote
     update_action_type('vote')
-    reload('投票の時間です。', 'all')
+    call_reload('投票の時間です。', 'all')
   end
 
   def vote
@@ -43,11 +45,20 @@ class GamesController < ApplicationController
       if message.include?('投票結果が同数です。再度投票してください。')
         update_action_type('vote')
       else
+        Message.destroy_all(village_id: current_user.village_id)
         update_action_type('night')
       end
-      reload(message, 'all')
+      call_reload(message, 'all')
     else
-      reload(nil, 'myself')
+      call_reload(nil, 'myself')
     end
+  end
+
+  def tweet
+    Message.create(village_id: current_user.village_id,
+                   message_type: 'tweet',
+                   content: current_user.name +
+                   ':' + params[:user_name] + 'を殺そう')
+    call_reload('', 'all')
   end
 end

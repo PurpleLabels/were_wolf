@@ -15,9 +15,15 @@ job = Job.new(name:"霊媒師")
 job.save
 job = Job.new(name:"狂人")
 job.save
+job = Job.new(name:"狂信者")
+job.save
+job = Job.new(name:"共有者")
+job.save
+job = Job.new(name:"妖狐")
+job.save
 
 
-@village_settings = 
+@village_settings =
 VillageSetting.joins("LEFT JOIN jobs ON villageSettings.job_id = jobs.id).where("village_id = 82" )
 
 VillageSetting.joins("INNER JOIN jobs ON village_settings.job_id = jobs.id").select('village_settings.*,jobs.*').where("village_id = 82" )

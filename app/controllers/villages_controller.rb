@@ -2,9 +2,10 @@ class VillagesController < ApplicationController
   include Common
   def show
     @village = Village.find(params[:id])
-    current_user.update(village_id: params[:id], action_type: 'no_Game')
+    current_user.update(village_id: params[:id],
+                        action_type: 'no_Game', job_id: 2)
     @users = User.where(village_id: params[:id])
-    #selectが気になる
+    # selectが気になる
     @village_settings = VillageSetting.joins(:job)
                                       .select('village_settings.*,jobs.*')
                                       .where(village_id: params[:id])
@@ -12,13 +13,7 @@ class VillagesController < ApplicationController
   end
 
   def update
-    village = Village.find(params[:id])
-    time = params[:village]
-    village.update(day_time: time[:day_time],
-                   night_time: time[:night_time],
-                   vote_time: time[:vote_time])
     update_job_number(params)
-    redirect_to action: 'show', id: params.require(:id)
   end
 
   def new
@@ -39,8 +34,9 @@ class VillagesController < ApplicationController
   end
 
   def reload
-    @users = User.where(village_id: params[:village_id])
+    @users = User.where(village_id: params[:village_id]).order('seq_no asc')
     @village = Village.find(params[:village_id])
+    @tweet = Message.where(village_id: params[:village_id], message_type: 'tweet').order('updated_at desc')[0]
     if params[:taget] == 'all'
       ActionCable.server.broadcast "village:#{@village.id}",
                                    count: @users.count,

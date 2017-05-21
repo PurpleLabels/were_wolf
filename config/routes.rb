@@ -25,7 +25,7 @@ Rails.application.routes.draw do
     end
     resources :games, only: [:new] do
       collection do
-        get :night, :stop, :vote, :reload, :to_vote
+        get :night, :stop, :vote, :reload, :to_vote, :tweet
       end
     end
   end
