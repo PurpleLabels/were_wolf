@@ -1,6 +1,6 @@
 <li class="collection-item avatar">
   <%=get_tweet_link(user)%>
-  <span class="title"><%= user.name %></span>
+  <span class="title"><%= user.name + user.action_type %></span>
   <br><%=get_job(user)%>
   <div class="secondary-content">
     <%=get_action(user)%>
